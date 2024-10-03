@@ -1,0 +1,93 @@
+import json
+import datetime
+
+# File to store expense data
+EXPENSE_FILE = 'expenses.json'
+
+# Load expenses from file or initialize an empty list
+def load_expenses():
+    try:
+        with open(EXPENSE_FILE, 'r') as file:
+            return json.load(file)
+    except FileNotFoundError:
+        return []
+
+# Save expenses to file
+def save_expenses(expenses):
+    with open(EXPENSE_FILE, 'w') as file:
+        json.dump(expenses, file, indent=4)
+
+# Add a new expense
+def add_expense():
+    date = str(datetime.date.today())
+    category = input("Enter the expense category (e.g., food, transportation, entertainment): ").strip()
+    amount = float(input("Enter the amount spent: "))
+    description = input("Enter a brief description: ").strip()
+
+    expense = {
+        "date": date,
+        "category": category,
+        "amount": amount,
+        "description": description
+    }
+
+    expenses.append(expense)
+    save_expenses(expenses)
+    print("Expense added successfully.\n")
+
+# View monthly expenses summary
+def view_monthly_summary():
+    month = input("Enter the month (e.g., '2024-09') to view expenses: ").strip()
+    monthly_expenses = [e for e in expenses if e["date"].startswith(month)]
+    total = sum(e['amount'] for e in monthly_expenses)
+
+    print(f"\nMonthly Expense Summary for {month}:")
+    for e in monthly_expenses:
+        print(f"  - {e['date']}: {e['category']} - ${e['amount']} ({e['description']})")
+    print(f"Total Spent: ${total}\n")
+
+# View category-wise summary
+def view_category_summary():
+    category = input("Enter the category to view expenses: ").strip()
+    category_expenses = [e for e in expenses if e["category"].lower() == category.lower()]
+    total = sum(e['amount'] for e in category_expenses)
+
+    print(f"\nCategory-wise Expense Summary for '{category}':")
+    for e in category_expenses:
+        print(f"  - {e['date']}: ${e['amount']} ({e['description']})")
+    print(f"Total Spent on '{category}': ${total}\n")
+
+# Main Menu
+def main():
+    print("Welcome to the Expense Tracker")
+
+    while True:
+        print("\nMenu:")
+        print("1. Add Expense")
+        print("2. View Monthly Summary")
+        print("3. View Category-wise Summary")
+        print("4. Exit")
+
+        try:
+            choice = int(input("Enter your choice: ").strip())
+
+            if choice == 1:
+                add_expense()
+            elif choice == 2:
+                view_monthly_summary()
+            elif choice == 3:
+                view_category_summary()
+            elif choice == 4:
+                print("Exiting the Expense Tracker. Goodbye!")
+                break
+            else:
+                print("Invalid choice. Please try again.")
+        except ValueError:
+            print("Error: Please enter a valid number.\n")
+        except Exception as e:
+            print(f"Error: {e}\n")
+
+# Load expenses from file and run the main menu
+if __name__ == "__main__":
+    expenses = load_expenses()
+    main()
